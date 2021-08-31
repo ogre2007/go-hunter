@@ -22,11 +22,38 @@ int string_to_buffer(const char *string, char *out) {
 import (
 	"fmt"
 	"unsafe"
+	"strings"
+	"bufio"
+	"reflect"
 )
+
+
+func StringToBytes(s string) [] byte {
+    strHeader :=(*reflect.StringHeader)(unsafe.Pointer(&s))
+    bytesHeader:=reflect.SliceHeader{
+        Data: strHeader.Data,
+        Cap: strHeader.Len,
+        Len: strHeader.Len,
+    }
+    return *(*[]byte)(unsafe.Pointer(&bytesHeader))
+}
+
+func GetBytes() []byte {
+	reader := bufio.NewReader(strings.NewReader("hello!123"))
+	s, _ := reader.ReadString('\n')
+	out := StringToBytes(s)
+	fmt.Printf("GetBytes: %s\n", out)
+	return out
+}
+
 func main() {
 	y := 1+2
 	x := unsafe.Pointer(&y)//C.sum(1, 2)
 	fmt.Printf(string(*(*uint32)(x)))//fmt.Printf(string(int(*x)))
+
+	bytesResult := GetBytes()
+	fmt.Printf("main: %s\n", bytesResult)
+
 	//defer C.free(unsafe.Pointer(x))
 
 	//simple_string := C.CString("I am a C-string in Go-land!")
