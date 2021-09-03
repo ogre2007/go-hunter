@@ -25,6 +25,7 @@ import (
 	"strings"
 	"bufio"
 	"reflect"
+    "math/rand"
 )
 
 
@@ -43,14 +44,63 @@ func GetBytes() []byte {
 	s, _ := reader.ReadString('\n')
 	out := StringToBytes(s)
 	fmt.Printf("GetBytes: %s\n", out)
+
 	return out
 }
 
-func main() {
-	y := 1+2
-	x := unsafe.Pointer(&y)//C.sum(1, 2)
-	fmt.Printf(string(*(*uint32)(x)))//fmt.Printf(string(int(*x)))
+func UnsafeDefinition() unsafe.Pointer {
+    var x unsafe.Pointer
+    y := rand.Intn(100)
+    x = unsafe.Pointer(&y)
+    if (UnsafeCall()) {
+        fmt.Println("bingo!")
+    }
+    return x
+}
 
+func UnsafeParameter(x unsafe.Pointer) int {
+    y := rand.Intn(100)
+    if (UnsafeCall()) {
+        fmt.Println("bingo!")
+    }
+    return *(*int)(x) + y 
+}
+
+func UnsafeAssignment() unsafe.Pointer {
+    y := rand.Intn(100)
+    x := unsafe.Pointer(&y)
+    if (UnsafeCall()) {
+        fmt.Println("bingo!")
+    }
+    return x
+}
+
+func UnsafeCall() bool {
+    x := rand.Intn(100)
+    UnsafeParameter(unsafe.Pointer(&x))
+    return true
+}
+
+func main() {
+    /*
+	y := 1+2
+	x := unsafe.Pointer(&y)
+    z := rand.Intn(100)
+    xxy := unsafe.Pointer(&z)
+    xvalue := *(*uint32)(x)
+    zvalue := *(*uint32)(xxy)
+	fmt.Printf("%d",xvalue + zvalue)
+    */
+    x := UnsafeDefinition()
+    _ = x
+    y := UnsafeParameter(x)
+    _ = y
+    z := UnsafeAssignment()
+    _ = z
+    v := UnsafeCall()
+    _ = v
+    
+    
 	bytesResult := GetBytes()
 	fmt.Printf("main: %s\n", bytesResult)
 
